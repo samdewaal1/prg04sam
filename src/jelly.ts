@@ -1,7 +1,7 @@
 import * as PIXI from "pixi.js";
 
 export class Jelly extends PIXI.Sprite {
-  private speed: number;
+   speed: number;
 
   constructor(texture: PIXI.Texture) {
     super(texture);
@@ -10,7 +10,7 @@ export class Jelly extends PIXI.Sprite {
     this.y = Math.random() * window.innerHeight;
     this.anchor.set(0.5);
     this.scale.set(0.4 + Math.random() * 0.6);
-
+    //verschillende kleuren 
     const filter = new PIXI.filters.ColorMatrixFilter();
     filter.hue(Math.random() * 360, false);
     this.filters = [filter];
@@ -29,7 +29,5 @@ export class Jelly extends PIXI.Sprite {
     }
   }
 
-  public hitTurtle() {
-    console.log("hit turtle");
-  }
+
 }

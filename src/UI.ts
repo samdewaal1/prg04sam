@@ -25,8 +25,5 @@ export class UI {
  
     }
 
-    public updateScore(s:number) {
-        this.score += s
-        this.scoreField.text = `Score : ${this.score}`
-    }
+
 }

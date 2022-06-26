@@ -549,11 +549,6 @@ class Game {
         this.ui = new _ui.UI(this);
         this.loader = new _pixiJs.Loader();
         this.loader.add("jellyTexture", _jellyPngDefault.default).add("bubbleTexture", _bubblePngDefault.default).add("waterTexture", _tilingwaterPngDefault.default).add("turtleTexture", _turtlePngDefault.default);
-        this.loader.onProgress.add((loader)=>this.showProgress(loader)
-        );
-        this.loader.onError.add((arg)=>{
-            console.error(arg);
-        });
         this.loader.load(()=>this.startGame()
         );
     }
@@ -573,30 +568,6 @@ class Game {
         this.pixi.ticker.add(()=>this.update()
         );
     }
-    gameOver() {
-        console.log("game over");
-        this.pixi.stop();
-        this.gameOverButton = new _pixiJs.Sprite(_pixiJs.Texture.WHITE) // jouw eigen sprite hier
-        ;
-        this.gameOverButton.width = 100;
-        this.gameOverButton.height = 50;
-        this.gameOverButton.x = 400;
-        this.gameOverButton.y = 200;
-        this.gameOverButton.interactive = true;
-        this.gameOverButton.buttonMode = true;
-        this.gameOverButton.on('pointerdown', ()=>this.resetGame()
-        );
-        this.pixi.stage.addChild(this.gameOverButton);
-    }
-    resetGame() {
-        // verwijder de game over button
-        this.gameOverButton.destroy();
-        // voorbeeld van het verwijderen van game elementen
-        for (let bubble of this.bubbles)bubble.destroy();
-        this.bubbles = [];
-        // herstart pixi
-        this.pixi.start();
-    }
     shootBubble(bx, by) {
         let bubble = new _bubble.Bubble(bx, by, this, this.loader.resources["bubbleTexture"].texture);
         this.pixi.stage.addChild(bubble);
@@ -612,7 +583,7 @@ class Game {
             for (let b of this.bubbles)if (this.collision(b, jelly)) {
                 b.hit();
                 jelly.hit();
-                console.log(this.checkCollisions());
+                console.log("hit");
             }
         }
         for (let bubble of this.bubbles)bubble.update();
@@ -622,14 +593,6 @@ class Game {
         const bounds1 = sprite1.getBounds();
         const bounds2 = sprite2.getBounds();
         return bounds1.x < bounds2.x + bounds2.width && bounds1.x + bounds1.width > bounds2.x && bounds1.y < bounds2.y + bounds2.height && bounds1.y + bounds1.height > bounds2.y;
-    }
-    checkCollisions() {
-        for (let bubble of this.bubbles){
-            for (let jelly of this.jellys)if (this.collision(bubble, jelly)) {
-                this.ui.updateScore(10);
-                break;
-            }
-        }
     }
 }
 new Game();
@@ -37145,6 +37108,7 @@ class Jelly extends _pixiJs.Sprite {
         this.y = Math.random() * window.innerHeight;
         this.anchor.set(0.5);
         this.scale.set(0.4 + Math.random() * 0.6);
+        //verschillende kleuren 
         const filter = new _pixiJs.filters.ColorMatrixFilter();
         filter.hue(Math.random() * 360, false);
         this.filters = [
@@ -37162,21 +37126,19 @@ class Jelly extends _pixiJs.Sprite {
             this.y = Math.random() * window.innerHeight;
         }
     }
-    hitTurtle() {
-        console.log("hit turtle");
-    }
 }
 
 },{"pixi.js":"dsYej","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"jmLOv":[function(require,module,exports) {
 var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
 parcelHelpers.defineInteropFlag(exports);
+//Player
 parcelHelpers.export(exports, "Turtle", ()=>Turtle
 );
 var _pixiJs = require("pixi.js");
 class Turtle extends _pixiJs.Sprite {
     xspeed = 0;
     yspeed = 0;
-    lives = 3;
+    //Object
     constructor(mygame, texture){
         super(texture);
         this.xspeed = 0;
@@ -37185,39 +37147,41 @@ class Turtle extends _pixiJs.Sprite {
         this.y = 400;
         this.scale.set(0.7);
         this.mygame = mygame;
-        console.log(this.mygame);
+        //KeyboardControls
         window.addEventListener("keydown", (e)=>this.onKeyDown(e)
         );
         window.addEventListener("keyup", (e)=>this.onKeyUp(e)
         );
     }
+    hit() {
+        this.x = window.innerWidth + 100;
+    }
+    //swim
     swim() {
         this.x += this.xspeed;
         this.y += this.yspeed;
     }
+    //shoot bubbles
     shoot() {
         this.mygame.shootBubble(this.x, this.y);
     }
+    //besturing met arrowkey
     onKeyDown(e) {
         switch(e.key.toUpperCase()){
             case " ":
                 this.shoot();
                 break;
-            case "A":
             case "ARROWLEFT":
-                this.xspeed = -7;
+                this.xspeed = -5;
                 break;
-            case "D":
             case "ARROWRIGHT":
-                this.xspeed = 7;
+                this.xspeed = 5;
                 break;
-            case "W":
             case "ARROWUP":
-                this.yspeed = -7;
+                this.yspeed = -5;
                 break;
-            case "S":
             case "ARROWDOWN":
-                this.yspeed = 7;
+                this.yspeed = 5;
                 break;
         }
     }
@@ -37239,13 +37203,8 @@ class Turtle extends _pixiJs.Sprite {
                 break;
         }
     }
-    loseLife() {
-        // Player loses 1 life
-        this.lives--;
-        //console.log(this.lives)
-        // Update amount of lives in the div
-        let livesAmount = document.getElementById("lives");
-        livesAmount.innerText = 'Lives: ' + this.lives.toString();
+    keepInScreen() {
+        if (this.getBounds().left > this.mygame.pixi.screen.right) this.x = -this.getBounds().width;
     }
 }
 
@@ -37272,6 +37231,7 @@ class Bubble extends _pixiJs.Sprite {
         if (this.x > window.innerWidth) {
             this.mygame.removeBubble(this);
             this.destroy();
+            console.log('hit');
         }
     }
 }
@@ -37298,10 +37258,6 @@ class UI {
         this.scoreField = new _pixiJs.Text('Score : 0', style);
         this.scoreField.x = 20;
         this.scoreField.y = 20;
-    }
-    updateScore(s) {
-        this.score += s;
-        this.scoreField.text = `Score : ${this.score}`;
     }
 }
 

@@ -22,6 +22,7 @@ export class Bubble extends PIXI.Sprite {
     if (this.x > window.innerWidth) {
       this.mygame.removeBubble(this);
       this.destroy();
+      console.log('hit')
     }
   }
 }

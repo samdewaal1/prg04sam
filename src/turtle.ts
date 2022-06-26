@@ -1,12 +1,14 @@
 import * as PIXI from "pixi.js";
 import { Game } from "./game";
-
+  //Player
 export class Turtle extends PIXI.Sprite {
   private xspeed = 0;
   private yspeed = 0;
-  private mygame: Game;
-  public lives: number = 3
 
+  //game
+  private mygame: Game;
+
+  //Object
   constructor(mygame: Game, texture: PIXI.Texture) {
     super(texture);
     this.xspeed = 0;
@@ -15,41 +17,41 @@ export class Turtle extends PIXI.Sprite {
     this.y = 400;
     this.scale.set(0.7);
     this.mygame = mygame;
-    console.log(this.mygame);
 
+    //KeyboardControls
     window.addEventListener("keydown", (e: KeyboardEvent) => this.onKeyDown(e));
     window.addEventListener("keyup", (e: KeyboardEvent) => this.onKeyUp(e));
   }
-
+  public hit() {
+    this.x = window.innerWidth + 100;
+  }
+  //swim
   public swim() {
     this.x += this.xspeed;
     this.y += this.yspeed;
   }
-
+  //shoot bubbles
   private shoot() {
     this.mygame.shootBubble(this.x, this.y);
   }
 
+  //besturing met arrowkey
   private onKeyDown(e: KeyboardEvent): void {
     switch (e.key.toUpperCase()) {
       case " ":
         this.shoot();
         break;
-      case "A":
       case "ARROWLEFT":
-        this.xspeed = -7;
+        this.xspeed = -5;
         break;
-      case "D":
       case "ARROWRIGHT":
-        this.xspeed = 7;
+        this.xspeed = 5;
         break;
-      case "W":
       case "ARROWUP":
-        this.yspeed = -7;
+        this.yspeed = -5;
         break;
-      case "S":
       case "ARROWDOWN":
-        this.yspeed = 7;
+        this.yspeed = 5;
         break;
     }
   }
@@ -74,14 +76,10 @@ export class Turtle extends PIXI.Sprite {
 
 
   }
-  public loseLife() {
-    // Player loses 1 life
-    this.lives--;
-    //console.log(this.lives)
+  keepInScreen(){
+    if (this.getBounds().left > this.mygame.pixi.screen.right){
+        this.x = -this.getBounds().width
+    }
 
-    // Update amount of lives in the div
-    let livesAmount:HTMLElement = document.getElementById("lives") as HTMLElement;
-    livesAmount.innerText = 'Lives: ' + this.lives.toString();
-
-
-  }}
+}
+  }

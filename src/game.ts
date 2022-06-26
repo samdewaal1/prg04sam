@@ -11,7 +11,7 @@ import bubbleImage from "./images/bubble.png";
 import waterImage from "./images/tilingwater.png";
 
 export class Game {
-  private pixi: PIXI.Application;
+   pixi: PIXI.Application;
   private loader: PIXI.Loader;
   private jellys: Jelly[] = [];
   private bubbles: Bubble[] = [];
@@ -30,11 +30,6 @@ export class Game {
       .add("bubbleTexture", bubbleImage)
       .add("waterTexture", waterImage)
       .add("turtleTexture", turtleImage);
-
-    this.loader.onProgress.add((loader) => this.showProgress(loader));
-    this.loader.onError.add((arg) => {
-      console.error(arg);
-    });
     this.loader.load(() => this.startGame());
   }
 
@@ -62,41 +57,11 @@ export class Game {
       this.loader.resources["turtleTexture"].texture!
     );
     this.pixi.stage.addChild(this.turtle);
-
     this.pixi.ticker.add(() => this.update());
     
 
     
   }
-
-    private gameOverButton : PIXI.Sprite
-
-    private gameOver(){
-        console.log("game over")
-        this.pixi.stop()
-        this.gameOverButton = new PIXI.Sprite(PIXI.Texture.WHITE) // jouw eigen sprite hier
-        this.gameOverButton.width = 100
-        this.gameOverButton.height = 50
-        this.gameOverButton.x = 400
-        this.gameOverButton.y = 200
-        this.gameOverButton.interactive = true
-        this.gameOverButton.buttonMode = true
-        this.gameOverButton.on('pointerdown', () => this.resetGame())
-
-        this.pixi.stage.addChild(this.gameOverButton)
-    }
-
-    private resetGame(){
-        // verwijder de game over button
-        this.gameOverButton.destroy() 
-        // voorbeeld van het verwijderen van game elementen
-        for (let bubble of this.bubbles) {
-            bubble.destroy()
-        }
-        this.bubbles = []
-        // herstart pixi
-        this.pixi.start()
-    }
 
 
   public shootBubble(bx: number, by: number) {
@@ -122,7 +87,7 @@ export class Game {
         if (this.collision(b, jelly)) {
           b.hit();
           jelly.hit();
-          console.log(this.checkCollisions())
+          console.log("hit")
 
         }
       }
@@ -147,14 +112,6 @@ export class Game {
       bounds1.y + bounds1.height > bounds2.y
     );
   }
-  private checkCollisions() {
-    for (let bubble of this.bubbles) {
-        for (let jelly of this.jellys) {
-            if(this.collision(bubble, jelly)){
-                this.ui.updateScore(10)
-                break
-            }
-        }
-    }
-  }}
+
+  }
   new Game()
