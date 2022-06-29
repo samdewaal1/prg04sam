@@ -13,6 +13,8 @@ import waterImage from "./images/tilingwater.png";
 export class Game {
   pixi: PIXI.Application;
   interface: UI;
+  player:PIXI.Sprite
+  enemy:PIXI.Sprite
   private loader: PIXI.Loader;
   private jellys: Jelly[] = [];
   private bubbles: Bubble[] = [];
@@ -33,7 +35,6 @@ export class Game {
       .add("bubbleTexture", bubbleImage)
       .add("waterTexture", waterImage)
       .add("turtleTexture", turtleImage);
-      
     this.loader.load(() => this.startGame());
   }
 
@@ -46,6 +47,7 @@ export class Game {
     );
     this.pixi.stage.addChild(bg);
     this.pixi.stage.addChild(this.interface);
+
 
     for (let i = 0; i < 14; i++) {
       let jelly = new Jelly(this.loader.resources["jellyTexture"].texture!);
@@ -92,13 +94,26 @@ export class Game {
 
 
         }
+        
       }
+      if (this.collision(jelly, this.turtle)){
+        jelly.hit();
+        this.turtle.hit;
+        this.interface.minLives(-1)
+
+        
+      }
+
+      
     }
     for (let bubble of this.bubbles) {
       bubble.update();
     }
 
     this.turtle.swim();
+    
+    
+
 
 
   }
@@ -112,8 +127,8 @@ export class Game {
       bounds1.x + bounds1.width > bounds2.x &&
       bounds1.y < bounds2.y + bounds2.height &&
       bounds1.y + bounds1.height > bounds2.y
-      
     );
+    console.log("hit");
   }
 
   }
