@@ -11,30 +11,30 @@ import bubbleImage from "./images/bubble.png";
 import waterImage from "./images/tilingwater.png";
 
 export class Game {
-   pixi: PIXI.Application;
+  pixi: PIXI.Application;
+  interface: UI;
   private loader: PIXI.Loader;
   private jellys: Jelly[] = [];
   private bubbles: Bubble[] = [];
   private turtle: Turtle;
-  private ui:UI
   public container: PIXI.Container
+
+  
 
   constructor() {
     const container = document.getElementById("container")!
+    
     this.pixi = new PIXI.Application({ width: 1920, height: 1080 })
     container.appendChild(this.pixi.view)
-    this.ui = new UI(this)
+    this.interface = new UI()
     this.loader = new PIXI.Loader();
     this.loader
       .add("jellyTexture", jellyImage)
       .add("bubbleTexture", bubbleImage)
       .add("waterTexture", waterImage)
       .add("turtleTexture", turtleImage);
+      
     this.loader.load(() => this.startGame());
-  }
-
-  private showProgress(p: PIXI.Loader) {
-    console.log(p.progress);
   }
 
 
@@ -45,6 +45,7 @@ export class Game {
       this.pixi.screen.height
     );
     this.pixi.stage.addChild(bg);
+    this.pixi.stage.addChild(this.interface);
 
     for (let i = 0; i < 14; i++) {
       let jelly = new Jelly(this.loader.resources["jellyTexture"].texture!);
@@ -59,8 +60,7 @@ export class Game {
     this.pixi.stage.addChild(this.turtle);
     this.pixi.ticker.add(() => this.update());
     
-
-    
+ 
   }
 
 
@@ -87,7 +87,9 @@ export class Game {
         if (this.collision(b, jelly)) {
           b.hit();
           jelly.hit();
+          this.interface.addScore(1)
           console.log("hit")
+
 
         }
       }
@@ -110,6 +112,7 @@ export class Game {
       bounds1.x + bounds1.width > bounds2.x &&
       bounds1.y < bounds2.y + bounds2.height &&
       bounds1.y + bounds1.height > bounds2.y
+      
     );
   }
 
